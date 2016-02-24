@@ -9,27 +9,47 @@ public class ExtendedInventories extends JavaPlugin {
 	
 	public static ExtendedInventories instance;
 	
-	public List<InventorySave> inventorysaves = new ArrayList<InventorySave>();
+	public static Configuration config;
 	
+	private List<InventorySave> inventorysaves = new ArrayList<InventorySave>();
+	
+	/**
+	 * @return the inventorysaves
+	 */
+	public List<InventorySave> getInventorysaves() {
+		return inventorysaves;
+	}
+	
+	/**
+	 * @param inventorysaves the inventorysaves to set
+	 */
+	public void setInventorysaves(List<InventorySave> inventorysaves) {
+		this.inventorysaves = inventorysaves;
+	}
+
+
+	//called when plugin is being enabled
 	@Override
 	public void onEnable() {
 		instance = this;
-		reloadCfg();
-		
+		config = new Configuration();
+		reloadInvSaves(false);
 		
 	}
 	
 	
+	
+	
 	@SuppressWarnings("unchecked")
-	private void reloadCfg(){
-		this.reloadConfig();
+	private void reloadInvSaves(boolean save){
 		
-		this.getConfig().addDefault("config.maxPlayerSavedInventories", 5);
-		this.getConfig().addDefault("config.restrictionForOP", false);
+		if (save) {
+			this.getConfig().set("inventories", getInventorysaves());
+		}
 		
-		if(this.getConfig().contains("inventories") && this.getConfig().isList("inventories")){
+		if (this.getConfig().contains("inventories") && this.getConfig().isList("inventories")) {
 			try {
-				inventorysaves = (List<InventorySave>) this.getConfig().getList("inventories");
+				setInventorysaves((List<InventorySave>) this.getConfig().getList("inventories"));
 			} catch (Exception e) {
 				this.getLogger().severe("The following problems occured while trying to load saved inventories!\n" + e.getMessage());
 			}
