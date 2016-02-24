@@ -1,5 +1,8 @@
 package de.expeehaa.bukkit.extendedinventories;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.configuration.file.FileConfiguration;
 
 public class Configuration {
@@ -12,6 +15,10 @@ public class Configuration {
 	private boolean saverestrictionForOP = false;
 	
 	private boolean writeToFileOnConfigChanges = false;
+	
+	private List<InventorySave> inventorysaves = new ArrayList<InventorySave>();
+	
+	
 	
 	//Constructor
 	public Configuration() {
@@ -32,6 +39,8 @@ public class Configuration {
 		setMaxPlayerSavedInventories(config.getInt("config.maxPlayerSavedInventories"));
 		setSaverestrictionForOP(config.getBoolean("config.saverestrictionForOP"));
 		setWriteToFileOnConfigChanges(config.getBoolean("config.writeToFileOnConfigChanges"));
+		
+		ExtendedInventories.instance.reloadConfig();
 	}
 	
 	public void saveConfigToFile(){
@@ -41,8 +50,34 @@ public class Configuration {
 		config.set("config.maxPlayerSavedInventories", getMaxPlayerSavedInventories());
 		config.set("config.saverestrictionForOP", isSaverestrictionForOP());
 		config.set("config.writeToFileOnConfigChanges", isWriteToFileOnConfigChanges());
+		
+		ExtendedInventories.instance.reloadConfig();
 	}
 
+	@SuppressWarnings("unchecked")
+	public void reloadInvSaves(){
+		if (config.contains("inventories") && config.isList("inventories")) {
+			try {
+				setInventorysaves((List<InventorySave>) config.getList("inventories"));
+			} catch (Exception e) {
+				ExtendedInventories.instance.getLogger().severe("The following problems occured while trying to load saved inventories!\n" + e.getMessage());
+			}
+		}
+		else {
+			config.set("inventories", new ArrayList<InventorySave>());
+			ExtendedInventories.instance.reloadConfig();
+			reloadInvSaves();
+		}
+	}
+	
+	public void saveInvSaves(){
+		ExtendedInventories.instance.reloadConfig();
+		
+		config.set("inventories", getInventorysaves());
+		
+		ExtendedInventories.instance.reloadConfig();
+	}
+	
 	/**
 	 * @return the maxPlayerSavedInventories
 	 */
@@ -84,5 +119,17 @@ public class Configuration {
 		this.writeToFileOnConfigChanges = writeToFileOnConfigChanges;
 	}
 
+	/**
+	 * @return the inventorysaves
+	 */
+	public List<InventorySave> getInventorysaves() {
+		return inventorysaves;
+	}
 	
+	/**
+	 * @param inventorysaves the inventorysaves to set
+	 */
+	public void setInventorysaves(List<InventorySave> inventorysaves) {
+		this.inventorysaves = inventorysaves;
+	}
 }
