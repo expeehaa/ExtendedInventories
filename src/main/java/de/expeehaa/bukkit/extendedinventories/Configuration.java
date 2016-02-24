@@ -125,7 +125,6 @@ public class Configuration {
 	public List<InventorySave> getInventorysaves() {
 		return inventorysaves;
 	}
-	
 	/**
 	 * @param inventorysaves the inventorysaves to set
 	 */
